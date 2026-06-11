@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: summar-backend
+    env_file:
+      - .env.production
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    networks:
+      - summar-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+        - NEXT_PUBLIC_APP_NAME=Summar.me
+        - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-https://summar.me}
+    container_name: summar-frontend
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      - NEXT_PUBLIC_APP_NAME=Summar.me
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-https://summar.me}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - summar-network
+
+networks:
+  summar-network:
+    driver: bridge

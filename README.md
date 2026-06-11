@@ -141,4 +141,4 @@ npm test
 
 ## License
 
-This project is provided as-is for educational and portfolio purposes.
+Released under the [MIT License](LICENSE).
